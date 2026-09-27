@@ -1,4 +1,27 @@
-export default function UserEdit({ onClose }) {
+export default function UserEdit({ onClose, onSubmit }) {
+    const submitHandler = (event) => {
+        event.preventDefault();
+        const fromData = new FormData(event.target);
+
+        // construct object from form data
+        const employee = {
+            firstName: fromData.get("firstName"),
+            lastName: fromData.get("lastName"),
+            email: fromData.get("email"),
+            phoneNumber: fromData.get("firstName"),
+            imageUrl: fromData.get("imageUrl"),
+            address: {
+                country: fromData.get("country"),
+                city: fromData.get("city"),
+                street: fromData.get("street"),
+                streetNumber: fromData.get("streetNumber"),
+            },
+        };
+
+        // call the onSubmit prop with the constucted employee obj
+        onSubmit(employee);
+    };
+
     return (
         <div className="overlay">
             <div className="backdrop"></div>
@@ -24,7 +47,7 @@ export default function UserEdit({ onClose }) {
                             </svg>
                         </button>
                     </header>
-                    <form>
+                    <form onSubmit={submitHandler}>
                         <div className="form-row">
                             <div className="form-group">
                                 <label htmlFor="firstName">First name</label>

@@ -8,14 +8,17 @@ import Pagination from "./components/Pagination";
 import UserSearch from "./components/UserSearch";
 import UserEdit from "./components/UserEdit";
 
+const baseUrl = "https://yukauijdnpyyejbrqlfh.supabase.co/rest/v1/users";
+const apiKey = "sb_publishable_wALp7ccw7naKjMiuuoooUw_dje6rr5m";
+
 export default function App() {
     const [users, setUsers] = useState([]);
     const [showEditUserModal, setShowEditUserModal] = useState(false);
 
     useEffect(() => {
-        fetch("https://yukauijdnpyyejbrqlfh.supabase.co/rest/v1/users", {
+        fetch(baseUrl, {
             headers: {
-                apiKey: "sb_publishable_wALp7ccw7naKjMiuuoooUw_dje6rr5m",
+                apiKey,
             },
         })
             .then((res) => res.json())
@@ -25,6 +28,27 @@ export default function App() {
 
     const addUserClickHandler = () => setShowEditUserModal(true);
     const addUserCloseHandler = () => setShowEditUserModal(false);
+    const submitUserHandler = (user) => {
+        fetch(baseUrl, {
+            method: "POST",
+            headers: {
+                apiKey,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(user),
+        })
+            .then((res) => res.json())
+            .then(() => console.log("User added"))
+            .catch((err) =>
+                console.error(
+                    "Error saving user: " +
+                        user.firstName +
+                        " " +
+                        user.lastName,
+                ),
+            )
+            .finally(() => setShowEditUserModal(false));
+    };
 
     return (
         <>
@@ -42,7 +66,10 @@ export default function App() {
                         Add new user
                     </button>
                     {showEditUserModal && (
-                        <UserEdit onClose={addUserCloseHandler} />
+                        <UserEdit
+                            onClose={addUserCloseHandler}
+                            onSubmit={submitUserHandler}
+                        />
                     )}
 
                     <Pagination />
