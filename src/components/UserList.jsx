@@ -1,7 +1,54 @@
+import { useState } from "react";
 import Spinner from "./Spinner";
 import UserListItem from "./UserListItem";
+import UserDetail from "./UserDetail";
+import ConfirmationDialog from "./ConfirmationDialog";
+import UserEdit from "./UserEdit";
+import { deleteUser, fetchUsers } from "../api/usersApi";
 
-export default function UserList({ users }) {
+export default function UserList({ users, onUserUpdate }) {
+    const [selectedUserId, setSelectedUserId] = useState(false);
+    const [showDetailUserModal, setShowDetailUserModal] = useState(false);
+    const [showEditUserModal, setShowEditUserModal] = useState(false);
+    const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
+
+    const showUserDetailsHandler = (userId) => {
+        setSelectedUserId(userId);
+        setShowDetailUserModal(true);
+    };
+
+    const closeModalHandler = () => {
+        setShowDetailUserModal(false);
+        setShowEditUserModal(false);
+        setShowDeleteUserModal(false);
+        setSelectedUserId(null);
+    };
+
+    const showEditUserHandler = (userId) => {
+        setSelectedUserId(userId);
+        setShowEditUserModal(true);
+    };
+
+    const showDeleteUserHandler = (userId) => {
+        setSelectedUserId(userId);
+        setShowDeleteUserModal(true);
+    };
+
+    const deleteUserHandler = async () => {
+        try {
+            await deleteUser(selectedUserId).then(() => {
+                alert(
+                    `User with id: ${selectedUserId} has been successfully deleted!`,
+                );
+                onUserUpdate();
+            });
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setShowDeleteUserModal(false);
+        }
+    };
+
     return (
         <>
             <div className="table-wrapper">
@@ -104,12 +151,38 @@ export default function UserList({ users }) {
                         </tr>
                     </thead>
                     <tbody>
+                        {users.length === 0 && <Spinner />}
                         {users.map((user) => (
-                            <UserListItem key={user.id} {...user} />
+                            <UserListItem
+                                key={user.id}
+                                {...user}
+                                onEditClick={showEditUserHandler}
+                                onDeleteClick={showDeleteUserHandler}
+                                onInfoClick={showUserDetailsHandler}
+                            />
                         ))}
                     </tbody>
                 </table>
             </div>
+
+            {showDetailUserModal && (
+                <UserDetail
+                    userId={selectedUserId}
+                    onClose={closeModalHandler}
+                />
+            )}
+
+            {showDeleteUserModal && (
+                <ConfirmationDialog
+                    actionType="Delete"
+                    itemName={selectedUserId}
+                    itemType="user account with id:"
+                    onClose={closeModalHandler}
+                    onConfirm={deleteUserHandler}
+                />
+            )}
+
+            {showEditUserModal && <UserEdit onClose={closeModalHandler} />}
         </>
     );
 }

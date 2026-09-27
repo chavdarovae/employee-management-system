@@ -1,12 +1,18 @@
-export default function ConfirmationDialog() {
+export default function ConfirmationDialog({
+    actionType,
+    itemType,
+    itemName,
+    onConfirm,
+    onClose,
+}) {
     return (
         <div className="overlay">
             <div className="backdrop"></div>
             <div className="modal">
                 <div className="confirm-container">
                     <header className="headers">
-                        <h2>Are you sure you want to delete this account?</h2>
-                        <button className="btn close">
+                        <h2>{`Are you sure you want to delete ${itemType} ${itemName}?`}</h2>
+                        <button className="btn close" onClick={onClose}>
                             <svg
                                 aria-hidden="true"
                                 focusable="false"
@@ -30,13 +36,15 @@ export default function ConfirmationDialog() {
                                 id="action-save"
                                 className="btn"
                                 type="submit"
+                                onClick={onConfirm}
                             >
-                                Delete
+                                {actionType}
                             </button>
                             <button
                                 id="action-cancel"
                                 className="btn"
                                 type="button"
+                                onClick={onClose}
                             >
                                 Cancel
                             </button>

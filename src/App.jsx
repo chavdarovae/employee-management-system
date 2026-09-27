@@ -7,20 +7,18 @@ import UserList from "./components/UserList";
 import Pagination from "./components/Pagination";
 import UserSearch from "./components/UserSearch";
 import UserEdit from "./components/UserEdit";
-
-const baseUrl = "https://yukauijdnpyyejbrqlfh.supabase.co/rest/v1/users";
-const apiKey = "sb_publishable_wALp7ccw7naKjMiuuoooUw_dje6rr5m";
+import { fetchUsers, saveUser } from "./api/usersApi";
 
 export default function App() {
     const [users, setUsers] = useState([]);
-    const [showEditUserModal, setShowEditUserModal] = useState(false);
+    const [showAddUserModal, setShowAddUserModal] = useState(false);
 
     useEffect(() => {
         fetchUsers().then((userList) => setUsers(userList));
     }, []); // it would be only executed on mounting
 
-    const addUserClickHandler = () => setShowEditUserModal(true);
-    const addUserCloseHandler = () => setShowEditUserModal(false);
+    const addUserClickHandler = () => setShowAddUserModal(true);
+    const addUserCloseHandler = () => setShowAddUserModal(false);
     const submitUserHandler = async (user) => {
         // send user to API
         try {
@@ -34,7 +32,17 @@ export default function App() {
             alert(
                 `User: ${user.firstName} ${user.lastName} has been successfully saved`,
             );
-            setShowEditUserModal(false);
+            setShowAddUserModal(false);
+        }
+    };
+
+    const userUpdateHandler = async () => {
+        try {
+            const refreshedList = await fetchUsers();
+            setUsers(refreshedList);
+        } catch (error) {
+            alert("Error refreshing user list");
+            console.error(error);
         }
     };
 
@@ -46,14 +54,14 @@ export default function App() {
                 <section className="card users-container">
                     <UserSearch />
 
-                    <UserList users={users} />
+                    <UserList users={users} onUserUpdate={userUpdateHandler} />
                     <button
                         className="btn-add btn"
                         onClick={addUserClickHandler}
                     >
                         Add new user
                     </button>
-                    {showEditUserModal && (
+                    {showAddUserModal && (
                         <UserEdit
                             onClose={addUserCloseHandler}
                             onSubmit={submitUserHandler}
@@ -67,27 +75,4 @@ export default function App() {
             <Footer />
         </>
     );
-}
-
-async function fetchUsers() {
-    const response = await fetch(baseUrl, {
-        headers: {
-            apiKey,
-        },
-    }).catch((err) => console.error("Error fetching users: " + err));
-
-    // @ts-ignore
-    const userList = await response.json();
-    return userList;
-}
-
-async function saveUser(user) {
-    return await fetch(baseUrl, {
-        method: "POST",
-        headers: {
-            apiKey,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-    }).catch((err) => console.error("Error saving user: " + user.lastName));
 }
