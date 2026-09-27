@@ -16,38 +16,26 @@ export default function App() {
     const [showEditUserModal, setShowEditUserModal] = useState(false);
 
     useEffect(() => {
-        fetch(baseUrl, {
-            headers: {
-                apiKey,
-            },
-        })
-            .then((res) => res.json())
-            .then((data) => setUsers(data))
-            .catch((err) => console.error("Error fetching users: " + err));
+        fetchUsers().then((userList) => setUsers(userList));
     }, []); // it would be only executed on mounting
 
     const addUserClickHandler = () => setShowEditUserModal(true);
     const addUserCloseHandler = () => setShowEditUserModal(false);
-    const submitUserHandler = (user) => {
-        fetch(baseUrl, {
-            method: "POST",
-            headers: {
-                apiKey,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(user),
-        })
-            .then((res) => res.json())
-            .then(() => console.log("User added"))
-            .catch((err) =>
-                console.error(
-                    "Error saving user: " +
-                        user.firstName +
-                        " " +
-                        user.lastName,
-                ),
-            )
-            .finally(() => setShowEditUserModal(false));
+    const submitUserHandler = async (user) => {
+        // send user to API
+        try {
+            await saveUser(user);
+            const refreshedList = await fetchUsers();
+            setUsers(refreshedList);
+        } catch (error) {
+            alert(`Error saving user: ${user.firstName} ${user.lastName}`);
+            console.error(error);
+        } finally {
+            alert(
+                `User: ${user.firstName} ${user.lastName} has been successfully saved`,
+            );
+            setShowEditUserModal(false);
+        }
     };
 
     return (
@@ -79,4 +67,27 @@ export default function App() {
             <Footer />
         </>
     );
+}
+
+async function fetchUsers() {
+    const response = await fetch(baseUrl, {
+        headers: {
+            apiKey,
+        },
+    }).catch((err) => console.error("Error fetching users: " + err));
+
+    // @ts-ignore
+    const userList = await response.json();
+    return userList;
+}
+
+async function saveUser(user) {
+    return await fetch(baseUrl, {
+        method: "POST",
+        headers: {
+            apiKey,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+    }).catch((err) => console.error("Error saving user: " + user.lastName));
 }
