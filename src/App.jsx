@@ -6,9 +6,11 @@ import Footer from "./components/Footer";
 import UserList from "./components/UserList";
 import Pagination from "./components/Pagination";
 import UserSearch from "./components/UserSearch";
+import UserEdit from "./components/UserEdit";
 
 export default function App() {
     const [users, setUsers] = useState([]);
+    const [showEditUserModal, setShowEditUserModal] = useState(false);
 
     useEffect(() => {
         fetch("https://yukauijdnpyyejbrqlfh.supabase.co/rest/v1/users", {
@@ -21,6 +23,9 @@ export default function App() {
             .catch((err) => console.error("Error fetching users: " + err));
     }, []); // it would be only executed on mounting
 
+    const addUserClickHandler = () => setShowEditUserModal(true);
+    const addUserCloseHandler = () => setShowEditUserModal(false);
+
     return (
         <>
             <Header />
@@ -30,7 +35,15 @@ export default function App() {
                     <UserSearch />
 
                     <UserList users={users} />
-                    <button className="btn-add btn">Add new user</button>
+                    <button
+                        className="btn-add btn"
+                        onClick={addUserClickHandler}
+                    >
+                        Add new user
+                    </button>
+                    {showEditUserModal && (
+                        <UserEdit onClose={addUserCloseHandler} />
+                    )}
 
                     <Pagination />
                 </section>

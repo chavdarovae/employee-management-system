@@ -1,4 +1,4 @@
-export default function UserEdit() {
+export default function UserEdit({ onClose }) {
     return (
         <div className="overlay">
             <div className="backdrop"></div>
@@ -6,7 +6,7 @@ export default function UserEdit() {
                 <div className="user-container">
                     <header className="headers">
                         <h2>Edit User/Add User</h2>
-                        <button className="btn close">
+                        <button className="btn close" onClick={onClose}>
                             <svg
                                 aria-hidden="true"
                                 focusable="false"
@@ -166,6 +166,7 @@ export default function UserEdit() {
                                 id="action-cancel"
                                 className="btn"
                                 type="button"
+                                onClick={onClose}
                             >
                                 Cancel
                             </button>
