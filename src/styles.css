@@ -588,7 +588,7 @@ ul {
   padding: 5px 20px;
   height: auto;
   width: auto;
-  margin-left: auto;
+  margin: auto 20px 20px auto;
 }
 
 /* Paggination  */
