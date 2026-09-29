@@ -1,34 +1,59 @@
-export default function UserEdit({ onClose, onSubmit }) {
-    const submitHandler = (event) => {
+import { useEffect, useState } from "react";
+import { fetchUserById, createUser, updateUser } from "../api/usersApi";
+
+export default function UserAdd({ onClose, onSuccess, userId }) {
+    const [user, setUser] = useState({});
+
+    useEffect(() => {
+        if (userId) {
+            fetchUserById(userId).then((userList) =>
+                setUser(userList[0] || {}),
+            );
+        }
+    }, [userId]);
+
+    const isEditMode = () => !!userId;
+
+    const submitHandler = async (event) => {
         event.preventDefault();
-        const fromData = new FormData(event.target);
+        const formData = new FormData(event.target);
 
         // construct object from form data
         const employee = {
-            firstName: fromData.get("firstName"),
-            lastName: fromData.get("lastName"),
-            email: fromData.get("email"),
-            phoneNumber: fromData.get("firstName"),
-            imageUrl: fromData.get("imageUrl"),
+            firstName: formData.get("firstName"),
+            lastName: formData.get("lastName"),
+            email: formData.get("email"),
+            phoneNumber: formData.get("phoneNumber"),
+            imageUrl: formData.get("imageUrl"),
             address: {
-                country: fromData.get("country"),
-                city: fromData.get("city"),
-                street: fromData.get("street"),
-                streetNumber: fromData.get("streetNumber"),
+                country: formData.get("country"),
+                city: formData.get("city"),
+                street: formData.get("street"),
+                streetNumber: formData.get("streetNumber"),
             },
         };
 
-        // call the onSubmit prop with the constucted employee obj
-        onSubmit(employee);
+        try {
+            if (isEditMode()) {
+                await updateUser(userId, employee);
+            } else {
+                await createUser(employee);
+            }
+
+            if (onSuccess) onSuccess();
+            if (onClose) onClose();
+        } catch (err) {
+            console.error("Error submitting form:", err);
+        }
     };
 
     return (
         <div className="overlay">
-            <div className="backdrop"></div>
+            <div className="backdrop" onClick={onClose}></div>
             <div className="modal">
                 <div className="user-container">
                     <header className="headers">
-                        <h2>Edit User/Add User</h2>
+                        <h2>{isEditMode() ? "Edit User" : "Add User"}</h2>
                         <button className="btn close" onClick={onClose}>
                             <svg
                                 aria-hidden="true"
@@ -59,6 +84,7 @@ export default function UserEdit({ onClose, onSubmit }) {
                                         id="firstName"
                                         name="firstName"
                                         type="text"
+                                        defaultValue={user.firstName || ""}
                                     />
                                 </div>
                             </div>
@@ -72,6 +98,7 @@ export default function UserEdit({ onClose, onSubmit }) {
                                         id="lastName"
                                         name="lastName"
                                         type="text"
+                                        defaultValue={user.lastName || ""}
                                     />
                                 </div>
                             </div>
@@ -88,6 +115,7 @@ export default function UserEdit({ onClose, onSubmit }) {
                                         id="email"
                                         name="email"
                                         type="text"
+                                        defaultValue={user.email || ""}
                                     />
                                 </div>
                             </div>
@@ -103,6 +131,7 @@ export default function UserEdit({ onClose, onSubmit }) {
                                         id="phoneNumber"
                                         name="phoneNumber"
                                         type="text"
+                                        defaultValue={user.phoneNumber || ""}
                                     />
                                 </div>
                             </div>
@@ -118,6 +147,7 @@ export default function UserEdit({ onClose, onSubmit }) {
                                     id="imageUrl"
                                     name="imageUrl"
                                     type="text"
+                                    defaultValue={user.imageUrl || ""}
                                 />
                             </div>
                         </div>
@@ -133,6 +163,9 @@ export default function UserEdit({ onClose, onSubmit }) {
                                         id="country"
                                         name="country"
                                         type="text"
+                                        defaultValue={
+                                            user.address?.country || ""
+                                        }
                                     />
                                 </div>
                             </div>
@@ -142,7 +175,12 @@ export default function UserEdit({ onClose, onSubmit }) {
                                     <span>
                                         <i className="fa-solid fa-city"></i>
                                     </span>
-                                    <input id="city" name="city" type="text" />
+                                    <input
+                                        id="city"
+                                        name="city"
+                                        type="text"
+                                        defaultValue={user.address?.city || ""}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -158,6 +196,9 @@ export default function UserEdit({ onClose, onSubmit }) {
                                         id="street"
                                         name="street"
                                         type="text"
+                                        defaultValue={
+                                            user.address?.street || ""
+                                        }
                                     />
                                 </div>
                             </div>
@@ -173,6 +214,9 @@ export default function UserEdit({ onClose, onSubmit }) {
                                         id="streetNumber"
                                         name="streetNumber"
                                         type="text"
+                                        defaultValue={
+                                            user.address?.streetNumber || ""
+                                        }
                                     />
                                 </div>
                             </div>

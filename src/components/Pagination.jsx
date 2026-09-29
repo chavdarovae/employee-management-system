@@ -1,18 +1,50 @@
-export default function Pagination() {
+export default function Pagination({
+    page = 1,
+    pageSize = 5,
+    totalCount = 0,
+    optionList = [5, 10, 15, 20],
+    onPageChange,
+    onPageSizeChange,
+}) {
+    const start = totalCount === 0 ? 0 : (page - 1) * pageSize + 1;
+    const end = Math.min(page * pageSize, totalCount);
+
+    const totalPages = Math.ceil(totalCount / pageSize) || 1;
+
+    const getFullOptionList = () => {
+        return !optionList.includes(pageSize)
+            ? [...optionList, pageSize].sort((a, b) => a - b)
+            : optionList;
+    };
     return (
         <div className="pagination position">
             <div className="limits">
                 <span>Items per page:</span>
-                <select name="limit" className="limit" defaultValue="5">
-                    <option defaultValue="5">5</option>
-                    <option defaultValue="5">10</option>
-                    <option defaultValue="5">15</option>
-                    <option defaultValue="5">20</option>
+                <select
+                    name="limit"
+                    className="limit"
+                    defaultValue={pageSize}
+                    onChange={(e) =>
+                        onPageSizeChange &&
+                        onPageSizeChange(Number(e.target.value))
+                    }
+                >
+                    {getFullOptionList().map((x) => (
+                        <option key={x} defaultValue={x}>
+                            {x}
+                        </option>
+                    ))}
                 </select>
             </div>
-            <p className="pages">1 - 1 of 1</p>
+            <p className="pages">
+                {start} - {end} of {totalCount}
+            </p>
             <div className="actions">
-                <button className="btn" title="First Page">
+                <button
+                    className="btn"
+                    title="First Page"
+                    onClick={() => onPageChange && onPageChange(1)}
+                >
                     <svg
                         aria-hidden="true"
                         focusable="false"
@@ -30,7 +62,13 @@ export default function Pagination() {
                     </svg>
                 </button>
 
-                <button className="btn" title="Previous Page">
+                <button
+                    className="btn"
+                    title="Previous Page"
+                    onClick={() =>
+                        page > 1 && onPageChange && onPageChange(page - 1)
+                    }
+                >
                     <svg
                         aria-hidden="true"
                         focusable="false"
@@ -47,7 +85,15 @@ export default function Pagination() {
                         ></path>
                     </svg>
                 </button>
-                <button className="btn" title="Next Page">
+                <button
+                    className="btn"
+                    title="Next Page"
+                    onClick={() =>
+                        page < totalPages &&
+                        onPageChange &&
+                        onPageChange(page + 1)
+                    }
+                >
                     <svg
                         aria-hidden="true"
                         focusable="false"
@@ -65,7 +111,11 @@ export default function Pagination() {
                     </svg>
                 </button>
 
-                <button className="btn" title="Last Page">
+                <button
+                    className="btn"
+                    title="Last Page"
+                    onClick={() => onPageChange && onPageChange(totalPages)}
+                >
                     <svg
                         aria-hidden="true"
                         focusable="false"

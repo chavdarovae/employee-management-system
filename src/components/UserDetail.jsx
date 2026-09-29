@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { fromIsoDate } from "../utils/dateTimeUtils";
-
-const baseUrl = "https://yukauijdnpyyejbrqlfh.supabase.co/rest/v1/users";
-const apiKey = "sb_publishable_wALp7ccw7naKjMiuuoooUw_dje6rr5m";
+import { fetchUserById } from "../api/usersApi";
 
 export default function UserDetail({ userId, onClose }) {
     const [user, setUser] = useState({});
 
     useEffect(() => {
-        const user = fetchUser(userId).then((userList) => setUser(userList[0]));
+        const user = fetchUserById(userId).then((userList) =>
+            setUser(userList[0]),
+        );
     }, [userId]);
 
     return (
         <div className="overlay">
-            <div className="backdrop"></div>
+            <div className="backdrop" onClick={onClose}></div>
             <div className="modal">
                 <div className="detail-container">
                     <header className="headers">
@@ -86,16 +86,4 @@ export default function UserDetail({ userId, onClose }) {
             </div>
         </div>
     );
-}
-
-async function fetchUser(userId) {
-    const response = await fetch(`${baseUrl}?id=eq.${userId}`, {
-        headers: {
-            apiKey,
-        },
-    }).catch((err) => console.error("Error fetching user with id: " + userId));
-
-    // @ts-ignore
-    const user = await response.json();
-    return user;
 }

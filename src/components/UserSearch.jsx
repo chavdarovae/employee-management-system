@@ -7,7 +7,7 @@ export default function UserSearch() {
                     focusable="false"
                     data-prefix="fas"
                     data-icon="user"
-                    className="svg-inline--fa fa-user SearchBar_icon__cXpTg"
+                    className="svg-inline--fa fa-user SearchBar_icon__cXpTg icon"
                     role="img"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 448 512"

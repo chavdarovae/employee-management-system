@@ -3,8 +3,8 @@ import Spinner from "./Spinner";
 import UserListItem from "./UserListItem";
 import UserDetail from "./UserDetail";
 import ConfirmationDialog from "./ConfirmationDialog";
-import UserEdit from "./UserEdit";
-import { deleteUser, fetchUsers } from "../api/usersApi";
+import UserAdd from "./UserAdd";
+import { deleteUser, fetchUsers, updateUser } from "../api/usersApi";
 
 export default function UserList({ users, onUserUpdate }) {
     const [selectedUserId, setSelectedUserId] = useState(false);
@@ -36,12 +36,8 @@ export default function UserList({ users, onUserUpdate }) {
 
     const deleteUserHandler = async () => {
         try {
-            await deleteUser(selectedUserId).then(() => {
-                alert(
-                    `User with id: ${selectedUserId} has been successfully deleted!`,
-                );
-                onUserUpdate();
-            });
+            await deleteUser(selectedUserId);
+            onUserUpdate();
         } catch (error) {
             console.log(error);
         } finally {
@@ -151,7 +147,7 @@ export default function UserList({ users, onUserUpdate }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.length === 0 && <Spinner />}
+                        {/* {users.length === 0 && <Spinner />} */}
                         {users.map((user) => (
                             <UserListItem
                                 key={user.id}
@@ -182,7 +178,13 @@ export default function UserList({ users, onUserUpdate }) {
                 />
             )}
 
-            {showEditUserModal && <UserEdit onClose={closeModalHandler} />}
+            {showEditUserModal && (
+                <UserAdd
+                    userId={selectedUserId}
+                    onClose={closeModalHandler}
+                    onSuccess={onUserUpdate}
+                />
+            )}
         </>
     );
 }

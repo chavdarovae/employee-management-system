@@ -7,7 +7,7 @@ export default function ConfirmationDialog({
 }) {
     return (
         <div className="overlay">
-            <div className="backdrop"></div>
+            <div className="backdrop" onClick={onClose}></div>
             <div className="modal">
                 <div className="confirm-container">
                     <header className="headers">
